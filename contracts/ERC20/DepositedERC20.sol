@@ -1,12 +1,12 @@
 pragma solidity ^0.5.0;
 
 import { ERC20 } from "./ERC20.sol";
-import { ICrossDomainMessenger } from "@eth-optimism/rollup-contracts/build/contracts/bridge/CrossDomainMessenger.interface.sol";
+import { IL2CrossDomainMessenger } from "@eth-optimism/rollup-contracts/build/contracts/bridge/L2CrossDomainMessenger.interface.sol";
 
 import { console } from "@nomiclabs/buidler/console.sol";
 
 contract DepositedERC20 is ERC20 {
-    ICrossDomainMessenger crossDomainMessenger;
+    IL2CrossDomainMessenger l2CrossDomainMessenger;
     address depositContractAddress;
     
     constructor(
@@ -29,12 +29,12 @@ contract DepositedERC20 is ERC20 {
     function init(address _depositContractAddress, address _crossDomainMessengerAddress) public {
         require(depositContractAddress == address(0));
         depositContractAddress = _depositContractAddress;
-        crossDomainMessenger = ICrossDomainMessenger(_crossDomainMessengerAddress);
+        l2CrossDomainMessenger = IL2CrossDomainMessenger(_crossDomainMessengerAddress);
         
     }
     
     function mint(address _to, uint256 _amount) public returns (bool success) {
-        require(crossDomainMessenger.crossDomainMsgSender() == depositContractAddress, "only the deposit contract can mint");
+        require(l2CrossDomainMessenger.xDomainMessageSender() == depositContractAddress, "only the deposit contract can mint");
         balances[_to] += _amount;
         totalSupply += _amount;
         return true;
@@ -47,6 +47,6 @@ contract DepositedERC20 is ERC20 {
             msg.sender,
             _amount
         );
-        crossDomainMessenger.sendMessage(depositContractAddress, messageData);
+        l2CrossDomainMessenger.sendMessage(depositContractAddress, messageData, uint32(gasleft()));
     }
 }

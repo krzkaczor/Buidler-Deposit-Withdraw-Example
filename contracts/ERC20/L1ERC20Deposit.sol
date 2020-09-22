@@ -1,10 +1,10 @@
 pragma solidity ^0.5.0;
 
 import { IERC20 } from "./ERC20.interface.sol";
-import { ICrossDomainMessenger } from "@eth-optimism/rollup-contracts/build/contracts/bridge/CrossDomainMessenger.interface.sol";
+import { IL1CrossDomainMessenger } from "@eth-optimism/rollup-contracts/build/contracts/bridge/L1CrossDomainMessenger.interface.sol";
 
 contract L1ERC20Deposit {
-    ICrossDomainMessenger L1CrossDomainMessenger;
+    IL1CrossDomainMessenger L1CrossDomainMessenger;
     address L2ERC20Address;
     IERC20 L1ERC20;
 
@@ -13,7 +13,7 @@ contract L1ERC20Deposit {
         address _L1ERC20Address,
         address _L2ERC20Address
     ) public {
-        L1CrossDomainMessenger = ICrossDomainMessenger(_L1CrossDomainMessengerAddress);
+        L1CrossDomainMessenger = IL1CrossDomainMessenger(_L1CrossDomainMessengerAddress);
         L1ERC20 = IERC20(_L1ERC20Address);
         L2ERC20Address = _L2ERC20Address;
     }
@@ -32,7 +32,7 @@ contract L1ERC20Deposit {
             _depositer,
             _amount
         );
-        L1CrossDomainMessenger.sendMessage(L2ERC20Address, messageData);
+        L1CrossDomainMessenger.sendMessage(L2ERC20Address, messageData, uint32(gasleft()));
     }
 
     function withdraw(
@@ -40,7 +40,7 @@ contract L1ERC20Deposit {
         uint _amount
     ) public {
         require(msg.sender == address(L1CrossDomainMessenger));
-        require(L1CrossDomainMessenger.crossDomainMsgSender() == L2ERC20Address);
+        require(L1CrossDomainMessenger.xDomainMessageSender() == L2ERC20Address);
         L1ERC20.transfer(_withdrawer, _amount);
     }
 }

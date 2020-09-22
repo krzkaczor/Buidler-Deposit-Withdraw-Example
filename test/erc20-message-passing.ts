@@ -20,8 +20,8 @@ describe('EOA L1 <-> L2 Message Passing', () => {
   let DepositedERC20Factory: ContractFactory
   let L1ERC20DepositFactory: ContractFactory
   before(async () => {
-    L1CrossDomainMessengerFactory = getContractFactory('MockCrossDomainMessenger', L1Wallet)
-    L2CrossDomainMessengerFactory = getContractFactory('MockCrossDomainMessenger', L2Wallet)
+    L1CrossDomainMessengerFactory = getContractFactory('L1MockCrossDomainMessenger', L1Wallet)
+    L2CrossDomainMessengerFactory = getContractFactory('L2MockCrossDomainMessenger', L2Wallet)
     ERC20Factory = await ethers.getContractFactory('ERC20')
     DepositedERC20Factory = await ethers.getContractFactory('DepositedERC20')
     L1ERC20DepositFactory = await ethers.getContractFactory('L1ERC20Deposit')
