@@ -57,4 +57,17 @@ contract ERC20 is IERC20 {
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return allowed[_owner][_spender];
     }
+
+    function _mint(address _owner, uint256 _value) internal returns (bool success) {
+        balances[_owner] += _value;
+        totalSupply += _value;
+        return true;
+    }
+
+    function _burn(address _owner, uint256 _value) internal returns (bool success) {
+        require(balances[_owner] >= _value);
+        balances[_owner] -= _value;
+        totalSupply -= _value;
+        return true;
+    }
 }
