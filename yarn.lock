@@ -56,13 +56,13 @@
     ts-md5 "^1.2.4"
     uuid "^3.3.3"
 
-"@eth-optimism/ovm-toolchain@0.0.1-alpha.5":
-  version "0.0.1-alpha.5"
-  resolved "https://registry.yarnpkg.com/@eth-optimism/ovm-toolchain/-/ovm-toolchain-0.0.1-alpha.5.tgz#abd961528e1d10eae523ce73547887d811df0aa2"
-  integrity sha512-2geNns/bo1f5Ic/iuT4JeAa+eIzUU8jhrfEOwcQ+W3UoA857rwbff5UqKNvMm3jXlI1YLIYQhXTbBZsezpBPEw==
+"@eth-optimism/ovm-toolchain@0.0.1-alpha.6":
+  version "0.0.1-alpha.6"
+  resolved "https://registry.yarnpkg.com/@eth-optimism/ovm-toolchain/-/ovm-toolchain-0.0.1-alpha.6.tgz#d8485e8753341496fef43834a953cf56f8bd90f4"
+  integrity sha512-rk01wL+ewXl6oDzoRMlo6Ahdrkv44VncD5/7e+KudZbAdslXRG4MAhWsVCpxRmDrcP4UPKg9gn150uggy/gtOg==
   dependencies:
     "@eth-optimism/core-utils" "^0.0.1-alpha.30"
-    "@eth-optimism/rollup-contracts" "^0.0.1-alpha.32"
+    "@eth-optimism/rollup-contracts" "^0.0.1-alpha.33"
     "@nomiclabs/buidler" "^1.4.4"
     bn.js "^5.1.3"
     child_process "^1.0.2"
@@ -72,10 +72,10 @@
     ethers-v4 "npm:ethers@4"
     ethers-v5 "npm:ethers@5.0.7"
 
-"@eth-optimism/rollup-contracts@0.0.1-alpha.32", "@eth-optimism/rollup-contracts@^0.0.1-alpha.32":
-  version "0.0.1-alpha.32"
-  resolved "https://registry.yarnpkg.com/@eth-optimism/rollup-contracts/-/rollup-contracts-0.0.1-alpha.32.tgz#818db478ddc766feab646c6389717ddc460e21bf"
-  integrity sha512-jqIUgBKdUPEv9c/dw3c/tpcjxMPnTwS2/eSHdRMAFJ+1K5gTdgEyj9ULC82Qofc/CxZEyTnt1fnhAZsrsFn2Jg==
+"@eth-optimism/rollup-contracts@0.0.1-alpha.33", "@eth-optimism/rollup-contracts@^0.0.1-alpha.33":
+  version "0.0.1-alpha.33"
+  resolved "https://registry.yarnpkg.com/@eth-optimism/rollup-contracts/-/rollup-contracts-0.0.1-alpha.33.tgz#c5c4df69d14bcb6793ab2348f194597d33c76425"
+  integrity sha512-tGaxloNMMlJgLMouj5VJ3Y6LlwB1qufhzQKIrCzDpZxviZNcmClLfm47EFewZRGQ9Tw2ZDsB1Mcc79+E3+z8Sw==
   dependencies:
     "@eth-optimism/core-db" "^0.0.1-alpha.30"
     "@eth-optimism/core-utils" "^0.0.1-alpha.30"
@@ -3708,9 +3708,9 @@ ethereumjs-common@^1.1.0, ethereumjs-common@^1.3.2, ethereumjs-common@^1.5.0:
   resolved "https://registry.yarnpkg.com/ethereumjs-common/-/ethereumjs-common-1.5.2.tgz#2065dbe9214e850f2e955a80e650cb6999066979"
   integrity sha512-hTfZjwGX52GS2jcVO6E2sx4YuFnf0Fhp5ylo4pEPhEffNln7vS59Hr5sLnp3/QCazFLluuBZ+FZ6J5HTp0EqCA==
 
-"ethereumjs-ovm@git+https://github.com/ethereum-optimism/ethereumjs-vm.git":
+"ethereumjs-ovm@git+https://github.com/ethereum-optimism/ethereumjs-vm":
   version "4.2.0"
-  resolved "git+https://github.com/ethereum-optimism/ethereumjs-vm.git#02ba6e77a88339b04a053b5e653f644acb1555b8"
+  resolved "git+https://github.com/ethereum-optimism/ethereumjs-vm#02ba6e77a88339b04a053b5e653f644acb1555b8"
   dependencies:
     "@types/debug" "^4.1.5"
     "@types/uuid" "^8.3.0"
@@ -6255,21 +6255,9 @@ merkle-patricia-tree@2.3.2, merkle-patricia-tree@^2.1.2, merkle-patricia-tree@^2
     rlp "^2.0.0"
     semaphore ">=1.0.1"
 
-merkle-patricia-tree@^3.0.0:
+merkle-patricia-tree@^3.0.0, "merkle-patricia-tree@git+https://github.com/kfichter/merkle-patricia-tree":
   version "3.0.0"
   resolved "git+https://github.com/kfichter/merkle-patricia-tree#ebd10c405be8ae909f1f82dea275a0e9ec1c8e46"
-  dependencies:
-    ethereumjs-util "^7.0.0"
-    level-mem "^5.0.1"
-    level-ws "^2.0.0"
-    readable-stream "^3.6.0"
-    rlp "^2.2.4"
-    semaphore-async-await "^1.5.1"
-
-"merkle-patricia-tree@git+https://github.com/kfichter/merkle-patricia-tree.git":
-  version "3.0.0"
-  uid ebd10c405be8ae909f1f82dea275a0e9ec1c8e46
-  resolved "git+https://github.com/kfichter/merkle-patricia-tree.git#ebd10c405be8ae909f1f82dea275a0e9ec1c8e46"
   dependencies:
     ethereumjs-util "^7.0.0"
     level-mem "^5.0.1"
