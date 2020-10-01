@@ -3,7 +3,7 @@ import { expect } from '../setup'
 /* External Imports */
 import { ethers } from '@nomiclabs/buidler'
 import { Signer, ContractFactory, Contract } from 'ethers'
-import { waffleV3 } from '@eth-optimism/ovm-toolchain'
+import { initCrossDomainMessengers, waitForCrossDomainMessages } from '@eth-optimism/ovm-toolchain'
 
 /* Internal Imports */
 import { increaseEthTime } from '../helpers'
@@ -25,9 +25,10 @@ describe('L1 <=> L2 ERC20 (Simplified Example)', () => {
   let L1_CrossDomainMessenger: Contract
   let L2_CrossDomainMessenger: Contract
   beforeEach(async () => {
-    const messengers = await waffleV3.initCrossDomainMessengers(
+    const messengers = await initCrossDomainMessengers(
       l1ToL2MessageDelay,
       l2ToL1MessageDelay,
+      ethers,
       signer
     )
 
@@ -75,7 +76,7 @@ describe('L1 <=> L2 ERC20 (Simplified Example)', () => {
       await increaseEthTime(l1ToL2MessageDelay + 1)
       
       // Use the simplified API, assume that messages are being relayed by a service.
-      await waffleV3.waitForCrossDomainMessages(signer)
+      await waitForCrossDomainMessages(signer)
 
       const finalL1Balance = await L1_ERC20.balanceOf(await signer.getAddress())
       const finalL2Balance = await L2_ERC20.balanceOf(await signer.getAddress())
@@ -95,7 +96,7 @@ describe('L1 <=> L2 ERC20 (Simplified Example)', () => {
       await increaseEthTime(l2ToL1MessageDelay + 1)
 
       // Use the simplified API, assume that messages are being relayed by a service.
-      await waffleV3.waitForCrossDomainMessages(signer)
+      await waitForCrossDomainMessages(signer)
 
       const finalL1Balance = await L1_ERC20.balanceOf(await signer.getAddress())
       const finalL2Balance = await L2_ERC20.balanceOf(await signer.getAddress())
@@ -113,7 +114,7 @@ describe('L1 <=> L2 ERC20 (Simplified Example)', () => {
 
       // Here we *don't* wait for the delay to pass, meaning the message doesn't exist yet.
       // Use the simplified API, assume that messages are being relayed by a service.
-      await waffleV3.waitForCrossDomainMessages(signer)
+      await waitForCrossDomainMessages(signer)
 
       const intermediateL1Balance = await L1_ERC20.balanceOf(await signer.getAddress())
       const intermediateL2Balance = await L2_ERC20.balanceOf(await signer.getAddress())
@@ -125,7 +126,7 @@ describe('L1 <=> L2 ERC20 (Simplified Example)', () => {
 
       // Now we actually wait for the delay and try again.
       await increaseEthTime(l2ToL1MessageDelay + 1)
-      await waffleV3.waitForCrossDomainMessages(signer)
+      await waitForCrossDomainMessages(signer)
 
       const finalL1Balance = await L1_ERC20.balanceOf(await signer.getAddress())
       const finalL2Balance = await L2_ERC20.balanceOf(await signer.getAddress())

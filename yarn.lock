@@ -56,10 +56,10 @@
     ts-md5 "^1.2.4"
     uuid "^3.3.3"
 
-"@eth-optimism/ovm-toolchain@0.0.1-alpha.6":
-  version "0.0.1-alpha.6"
-  resolved "https://registry.yarnpkg.com/@eth-optimism/ovm-toolchain/-/ovm-toolchain-0.0.1-alpha.6.tgz#d8485e8753341496fef43834a953cf56f8bd90f4"
-  integrity sha512-rk01wL+ewXl6oDzoRMlo6Ahdrkv44VncD5/7e+KudZbAdslXRG4MAhWsVCpxRmDrcP4UPKg9gn150uggy/gtOg==
+"@eth-optimism/ovm-toolchain@0.0.1-alpha.7":
+  version "0.0.1-alpha.7"
+  resolved "https://registry.yarnpkg.com/@eth-optimism/ovm-toolchain/-/ovm-toolchain-0.0.1-alpha.7.tgz#00d2f84e7c0df19791988e045131ea3c7ca8c6fa"
+  integrity sha512-diJTcUOOvpRf63PhmzwFuW09aJq+ScWGD++59wA+GSPFQay1n42pH2NPDVkjmOKhSqOLYVtnLzltabFDBLnJ8g==
   dependencies:
     "@eth-optimism/core-utils" "^0.0.1-alpha.30"
     "@eth-optimism/rollup-contracts" "^0.0.1-alpha.33"
@@ -3708,9 +3708,9 @@ ethereumjs-common@^1.1.0, ethereumjs-common@^1.3.2, ethereumjs-common@^1.5.0:
   resolved "https://registry.yarnpkg.com/ethereumjs-common/-/ethereumjs-common-1.5.2.tgz#2065dbe9214e850f2e955a80e650cb6999066979"
   integrity sha512-hTfZjwGX52GS2jcVO6E2sx4YuFnf0Fhp5ylo4pEPhEffNln7vS59Hr5sLnp3/QCazFLluuBZ+FZ6J5HTp0EqCA==
 
-"ethereumjs-ovm@git+https://github.com/ethereum-optimism/ethereumjs-vm":
+"ethereumjs-ovm@git+https://github.com/ethereum-optimism/ethereumjs-vm.git":
   version "4.2.0"
-  resolved "git+https://github.com/ethereum-optimism/ethereumjs-vm#02ba6e77a88339b04a053b5e653f644acb1555b8"
+  resolved "git+https://github.com/ethereum-optimism/ethereumjs-vm.git#02ba6e77a88339b04a053b5e653f644acb1555b8"
   dependencies:
     "@types/debug" "^4.1.5"
     "@types/uuid" "^8.3.0"
