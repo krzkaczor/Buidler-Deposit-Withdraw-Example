@@ -5,7 +5,7 @@ import { ERC20 } from "./ERC20.sol";
 
 /* Interface Imports */
 import { IERC20 } from "./ERC20.interface.sol";
-import { MockCrossDomainMessenger } from "@eth-optimism/rollup-contracts/build/contracts/bridge/mocks/MockCrossDomainMessenger.sol";
+import { ICrossDomainMessenger } from "@eth-optimism/rollup-contracts/build/contracts/bridge/interfaces/CrossDomainMessenger.interface.sol";
 
 /**
  * @title L2ReadyERC20
@@ -16,7 +16,7 @@ contract L2ReadyERC20 is ERC20 {
      * Variables *
      *************/
 
-    MockCrossDomainMessenger internal messenger;
+    ICrossDomainMessenger internal messenger;
     address internal otherERC20;
 
 
@@ -55,7 +55,7 @@ contract L2ReadyERC20 is ERC20 {
     )
         public
     {
-        messenger = MockCrossDomainMessenger(_messenger);
+        messenger = ICrossDomainMessenger(_messenger);
         otherERC20 = _otherERC20;
     }
 
