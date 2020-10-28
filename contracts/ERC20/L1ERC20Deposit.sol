@@ -23,7 +23,7 @@ contract L1ERC20Deposit {
             address(this),
             _amount
         );
-        //TODO Mint on L2!
+        //TODO Mint tokens to this user on L2!
     }
 
     function withdraw(
