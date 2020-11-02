@@ -5,8 +5,8 @@ import { ERC20 } from "./ERC20.sol";
 
 /* Interface Imports */
 import { IERC20 } from "./ERC20.interface.sol";
-import { ICrossDomainMessenger } from "@eth-optimism/rollup-contracts/build/contracts/bridge/interfaces/CrossDomainMessenger.interface.sol";
-
+import { iOVM_BaseCrossDomainMessenger } from "@eth-optimism/contracts/build/contracts/iOVM/bridge/iOVM_BaseCrossDomainMessenger.sol";
+import { console } from "@nomiclabs/buidler/console.sol";
 /**
  * @title L2ReadyERC20
  */
@@ -16,7 +16,7 @@ contract L2ReadyERC20 is ERC20 {
      * Variables *
      *************/
 
-    ICrossDomainMessenger internal messenger;
+    iOVM_BaseCrossDomainMessenger internal messenger;
     address internal otherERC20;
 
 
@@ -55,7 +55,7 @@ contract L2ReadyERC20 is ERC20 {
     )
         public
     {
-        messenger = ICrossDomainMessenger(_messenger);
+        messenger = iOVM_BaseCrossDomainMessenger(_messenger);
         otherERC20 = _otherERC20;
     }
 
@@ -77,6 +77,7 @@ contract L2ReadyERC20 is ERC20 {
             msg.sender,
             _amount
         );
+        console.log("burnt", _amount);
 
         // Generate encoded calldata to be executed on L2.
         bytes memory message = abi.encodeWithSignature(
@@ -106,6 +107,7 @@ contract L2ReadyERC20 is ERC20 {
             bool _success
         )
     {
+        console.log('tryint to mint', _amount);
         require(
             messenger.xDomainMessageSender() == otherERC20,
             "Minting message must be sent by the other ERC20 deposit contract."

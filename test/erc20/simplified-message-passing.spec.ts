@@ -3,13 +3,13 @@ import { expect } from '../setup'
 /* External Imports */
 import { ethers } from '@nomiclabs/buidler'
 import { Signer, ContractFactory, Contract } from 'ethers'
-import { initCrossDomainMessengers, waitForCrossDomainMessages } from '@eth-optimism/ovm-toolchain'
+import { initCrossDomainMessengers, relayL1ToL2Messages, relayL2ToL1Messages } from '@eth-optimism/ovm-toolchain'
 
 /* Internal Imports */
 import { increaseEthTime } from '../helpers'
 
-const l1ToL2MessageDelay = 100
-const l2ToL1MessageDelay = 1000
+const l1ToL2MessageDelay = 5 * 60 //5 minutes
+const l2ToL1MessageDelay = 60 * 60 * 24 * 7 //1 week
 
 describe('L1 <=> L2 ERC20 (Simplified Example)', () => {
   let signer: Signer
@@ -76,7 +76,7 @@ describe('L1 <=> L2 ERC20 (Simplified Example)', () => {
       await increaseEthTime(l1ToL2MessageDelay + 1)
       
       // Use the simplified API, assume that messages are being relayed by a service.
-      await waitForCrossDomainMessages(signer)
+      await relayL1ToL2Messages(signer)
 
       const finalL1Balance = await L1_ERC20.balanceOf(await signer.getAddress())
       const finalL2Balance = await L2_ERC20.balanceOf(await signer.getAddress())
@@ -96,7 +96,7 @@ describe('L1 <=> L2 ERC20 (Simplified Example)', () => {
       await increaseEthTime(l2ToL1MessageDelay + 1)
 
       // Use the simplified API, assume that messages are being relayed by a service.
-      await waitForCrossDomainMessages(signer)
+      await relayL2ToL1Messages(signer)
 
       const finalL1Balance = await L1_ERC20.balanceOf(await signer.getAddress())
       const finalL2Balance = await L2_ERC20.balanceOf(await signer.getAddress())
@@ -114,7 +114,9 @@ describe('L1 <=> L2 ERC20 (Simplified Example)', () => {
 
       // Here we *don't* wait for the delay to pass, meaning the message doesn't exist yet.
       // Use the simplified API, assume that messages are being relayed by a service.
-      await waitForCrossDomainMessages(signer)
+      await expect(
+        relayL1ToL2Messages(signer)
+      ).to.be.revertedWith('Message is not ready to be relayed. The delay period is not up yet!')
 
       const intermediateL1Balance = await L1_ERC20.balanceOf(await signer.getAddress())
       const intermediateL2Balance = await L2_ERC20.balanceOf(await signer.getAddress())
@@ -126,7 +128,7 @@ describe('L1 <=> L2 ERC20 (Simplified Example)', () => {
 
       // Now we actually wait for the delay and try again.
       await increaseEthTime(l2ToL1MessageDelay + 1)
-      await waitForCrossDomainMessages(signer)
+      await relayL1ToL2Messages(signer)
 
       const finalL1Balance = await L1_ERC20.balanceOf(await signer.getAddress())
       const finalL2Balance = await L2_ERC20.balanceOf(await signer.getAddress())
