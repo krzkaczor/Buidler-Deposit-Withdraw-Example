@@ -136,5 +136,44 @@ describe('L1 <=> L2 ERC20 (Simplified Example)', () => {
       expect(finalL1Balance).to.equal(0)
       expect(finalL2Balance).to.equal(originalL1Balance.add(originalL2Balance))
     })
+
+    it('should revert if there is no message to relay', async () => {
+      const originalL1Balance = await L1_ERC20.balanceOf(await signer.getAddress())
+      const originalL2Balance = await L2_ERC20.balanceOf(await signer.getAddress())
+
+      // Here we *don't* wait for the delay to pass, meaning the message doesn't exist yet.
+      // Use the simplified API, assume that messages are being relayed by a service.
+      await expect(
+        relayL1ToL2Messages(signer)
+      ).to.be.revertedWith('No pending messages to relay')
+
+      const finalL1Balance = await L1_ERC20.balanceOf(await signer.getAddress())
+      const finalL2Balance = await L2_ERC20.balanceOf(await signer.getAddress())
+      
+      // We burn immediately, so the L1 balance will already be zero even though the L2 balance
+      // hasn't been updated yet.
+      expect(finalL1Balance).to.equal(originalL1Balance)
+      expect(finalL2Balance).to.equal(originalL2Balance)
+    })
+
+    it('should revert if gas limit is set too low', async () => {
+      const originalL1Balance = await L1_ERC20.balanceOf(await signer.getAddress())
+      const originalL2Balance = await L2_ERC20.balanceOf(await signer.getAddress())
+
+      // Initiate the transfer.
+      await L1_ERC20.xDomainTransferLowGas(originalL1Balance)
+      // Wait for the delay to pass, otherwise the message won't exist.
+      await increaseEthTime(l2ToL1MessageDelay + 1)
+      // Here we *don't* wait for the delay to pass, meaning the message doesn't exist yet.
+      // Use the simplified API, assume that messages are being relayed by a service.
+      await expect(
+        relayL1ToL2Messages(signer)
+      ).to.be.revertedWith('Cross-domain message call reverted. Did you set your gas limit high enough?')
+
+      const finalL1Balance = await L1_ERC20.balanceOf(await signer.getAddress())
+      const finalL2Balance = await L2_ERC20.balanceOf(await signer.getAddress())
+      expect(finalL1Balance).to.equal(0)
+      expect(finalL2Balance).to.equal(originalL2Balance)
+    })
   })
 })

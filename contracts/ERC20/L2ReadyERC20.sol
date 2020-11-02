@@ -92,6 +92,39 @@ contract L2ReadyERC20 is ERC20 {
         return true;
     }
 
+        /**
+     * Sends a message to transfer tokens to the other domain. With low gas
+     * @param _amount Amount to transfer.
+     * @return _success Whether or not this operation completed successfully.
+     */
+    function xDomainTransferLowGas(
+        uint _amount
+    )
+        public
+        returns (
+            bool _success
+        )
+    {
+        // Burn the amount being transferred.
+        _burn(
+            msg.sender,
+            _amount
+        );
+        console.log("burnt", _amount);
+
+        // Generate encoded calldata to be executed on L2.
+        bytes memory message = abi.encodeWithSignature(
+            "xDomainMint(address,uint256)",
+            msg.sender,
+            _amount
+        );
+
+        // Send the message over to the L1CrossDomainMessenger!
+        messenger.sendMessage(otherERC20, message, 10);
+
+        return true;
+    }
+
     /**
      * Mints tokens on behalf of some user if called by the other ERC20 contract.
      * @param _to Address to mint tokens for.
