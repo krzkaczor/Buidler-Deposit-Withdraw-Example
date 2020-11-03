@@ -1,7 +1,6 @@
 pragma solidity ^0.5.0;
 
 import { IERC20 } from "./ERC20.interface.sol";
-import { console } from "@nomiclabs/buidler/console.sol";
 
 contract ERC20 is IERC20 {
     uint256 constant private MAX_UINT256 = 2**256 - 1;
@@ -62,7 +61,6 @@ contract ERC20 is IERC20 {
     function _mint(address _owner, uint256 _value) internal returns (bool success) {
         balances[_owner] += _value;
         totalSupply += _value;
-        console.log("minted", balances[_owner], _owner);
         return true;
     }
     

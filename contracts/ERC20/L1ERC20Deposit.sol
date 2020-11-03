@@ -2,9 +2,6 @@ pragma solidity ^0.5.0;
 
 import { IERC20 } from "./ERC20.interface.sol";
 import { L2ERC20 } from "./L2ERC20.sol";
-import { console } from "@nomiclabs/buidler/console.sol";
-
-
 
 contract L1ERC20Deposit {
     L2ERC20 l2ERC20;
@@ -38,8 +35,4 @@ contract L1ERC20Deposit {
         l1ERC20.transfer(_withdrawer, _amount);
     }
 
-    //function balance() public view returns (uint256 amount) {
-    //    return l1ERC20.balanceOf(address(this));
-    //}
- 
 }
