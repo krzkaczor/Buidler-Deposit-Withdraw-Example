@@ -42,6 +42,7 @@ describe('EOA L1 <-> L2 Message Passing', () => {
       L1ERC20.address,
       L2ERC20.address,
     )
+    L2ERC20.init(L1ERC20Deposit.address);
   })
 
   describe('deposit and withdrawal', () => {
@@ -62,7 +63,7 @@ describe('EOA L1 <-> L2 Message Passing', () => {
       console.log('balance on l2', l2balance.toString())
       console.log('balance on l1', l1balance.toString())
 
-      await L2ERC20.withdraw(2000)
+      await L2ERC20.withdraw(L1Wallet.getAddress(), 2000)
 
       console.log('withdrew 2000 coins')
 
@@ -71,6 +72,9 @@ describe('EOA L1 <-> L2 Message Passing', () => {
 
       console.log('balance on l2', l2balance.toString())
       console.log('balance on l1', l1balance.toString())
+
+      expect(l1balance).to.be.eq(7000)
+      expect(l2balance).to.be.equal(3000)
     })
   })
 })
