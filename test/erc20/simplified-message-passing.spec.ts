@@ -44,68 +44,52 @@ describe('EOA L1 <-> L2 Message Passing', () => {
       L1ERC20.address,
       L2ERC20.address,
     )
-    L2ERC20.init(L1ERC20Deposit.address); //,L1ERC20.address);
+    L2ERC20.init(L1ERC20Deposit.address);
 
 
   })
 
-  // can nest describes
-  describe('deposit and withdrawal, one wallet', () => {
+  describe('deposit and withdrawal', () => {
 
     it('should allow an EOA to deposit and withdraw between one wallet', async () => {
-      let l2balance = await L2ERC20.balanceOf(await AliceL1Wallet.getAddress())
-      let l1balance = await L1ERC20.balanceOf(await AliceL1Wallet.getAddress())
 
       await L1ERC20.approve(L1ERC20Deposit.address, 5000)
       await L1ERC20Deposit.deposit(AliceL1Wallet.getAddress(), 5000)
-      console.log('deposited 5000 coins')
-      
-      l2balance = await L2ERC20.balanceOf(await AliceL1Wallet.getAddress())
-      l1balance = await L1ERC20.balanceOf(await AliceL1Wallet.getAddress())
-      console.log('balance on l2', l2balance.toString())
-      console.log('balance on l1', l1balance.toString())
-     
-      await L2ERC20.withdraw(AliceL1Wallet.getAddress(), 2000)    
-      console.log('withdrew 2000 coins')
+
+      let l2balance = await L2ERC20.balanceOf(await AliceL1Wallet.getAddress())
+      let l1balance = await L1ERC20.balanceOf(await AliceL1Wallet.getAddress())
+      assert(l2balance == 5000, `l2 balance ${l2balance} != 5000` )
+      assert(l1balance == 5000, `l1 balance ${l1balance} != 5000` )
+
+      await L2ERC20.connect(AliceL1Wallet).withdraw(2000)    
 
       l2balance = await L2ERC20.balanceOf(await AliceL1Wallet.getAddress())
       l1balance = await L1ERC20.balanceOf(await AliceL1Wallet.getAddress())
-      console.log('balance on l2', l2balance.toString())
-      console.log('balance on l1', l1balance.toString())
-
-      expect(l1balance).to.be.eq(7000)
+      expect(l1balance).to.be.equal(7000)
       expect(l2balance).to.be.equal(3000)
     })
 
     it('should allow an EOA to deposit and withdraw between two wallets', async () => {
       await L1ERC20.approve(L1ERC20Deposit.address, 5000)
       await L1ERC20Deposit.deposit(AliceL1Wallet.getAddress(), 5000)
-      console.log('Alice deposited 5000 coins to L2')
+
+      L2ERC20.transfer(BobL1Wallet.getAddress(), 2000)
 
       let alice_l2balance = await L2ERC20.balanceOf(await AliceL1Wallet.getAddress())
       let alice_l1balance = await L1ERC20.balanceOf(await AliceL1Wallet.getAddress())
-      console.log('Alice balance on l2', alice_l2balance.toString())
-      console.log('Alice balance on l1', alice_l1balance.toString())
+      let bob_l2balance = await L2ERC20.balanceOf(await BobL1Wallet.getAddress())
+      let bob_l1balance = await L1ERC20.balanceOf(await BobL1Wallet.getAddress())
+      assert(alice_l2balance == 3000, `alice l2 balance ${alice_l2balance} != 3000` )
+      assert(alice_l1balance == 5000, `alice l1 balance ${alice_l1balance} != 5000` )
+      assert(bob_l2balance == 2000, `bob l2 balance ${bob_l2balance} != 2000` )
+      assert(bob_l1balance == 0, `bob l1 balance ${bob_l1balance} != 0` )
 
-      L2ERC20.transfer(BobL1Wallet.getAddress(), 2000)
-      console.log('Alice transfer 2000 to Bob')
+      await L2ERC20.connect(BobL1Wallet).withdraw(1000)
 
       alice_l2balance = await L2ERC20.balanceOf(await AliceL1Wallet.getAddress())
       alice_l1balance = await L1ERC20.balanceOf(await AliceL1Wallet.getAddress())
-      let bob_l2balance = await L2ERC20.balanceOf(await BobL1Wallet.getAddress())
-      let bob_l1balance = await L1ERC20.balanceOf(await BobL1Wallet.getAddress())
-      console.log('Alice balance on l2', alice_l2balance.toString())
-      console.log('Alice balance on l1', alice_l1balance.toString())
-      console.log('Bob balance on l2', bob_l2balance.toString())
-      console.log('Bob balance on l1', bob_l1balance.toString())
-
-      await L2ERC20.withdraw(BobL1Wallet.getAddress(), 1000)
-      console.log('Bob withdrew 1000')
-
       bob_l2balance = await L2ERC20.balanceOf(await BobL1Wallet.getAddress())
-      bob_l1balance = await L1ERC20.balanceOf(await BobL1Wallet.getAddress())      
-      console.log('Bob balance on l2', bob_l2balance.toString())
-      console.log('Bob balance on l1', bob_l1balance.toString())
+      bob_l1balance = await L1ERC20.balanceOf(await BobL1Wallet.getAddress())
 
       expect(alice_l2balance).to.be.eq(3000)
       expect(alice_l1balance).to.be.eq(5000)
@@ -113,52 +97,32 @@ describe('EOA L1 <-> L2 Message Passing', () => {
       expect(bob_l1balance).to.be.eq(1000)
     })
 
-    it('should not allow alice to withdraw transferred $', async () => {
+    it('should not allow Alice to withdraw transferred $', async () => {
       await L1ERC20.approve(L1ERC20Deposit.address, 5000)
       await L1ERC20Deposit.deposit(AliceL1Wallet.getAddress(), 5000)
-      console.log('Alice deposited 5000 coins to L2')
 
       L2ERC20.transfer(BobL1Wallet.getAddress(), 5000)
-      console.log('Alice transfer 5000 to Bob')
 
-      let alice_l2balance = await L2ERC20.balanceOf(await AliceL1Wallet.getAddress())
-      let alice_l1balance = await L1ERC20.balanceOf(await AliceL1Wallet.getAddress())
-      console.log('Alice balance on l2', alice_l2balance.toString())
-      console.log('Alice balance on l1', alice_l1balance.toString())
-
-      console.log('Alice tries to withdraw $ she doesnt have')
-      await expect(L2ERC20.withdraw(AliceL1Wallet.getAddress(), 2000)).to.be.revertedWith("account doesn't have enough coins to burn")
+      await expect(L2ERC20.connect(AliceL1Wallet).withdraw(2000)).to.be.revertedWith("account doesn't have enough coins to burn")
     })
 
-    it('should not allow bob to withdraw twice', async () => {
+    it('should not allow Bob to withdraw twice', async () => {
       await L1ERC20.approve(L1ERC20Deposit.address, 5000)
-      await L1ERC20Deposit.deposit(AliceL1Wallet.getAddress(), 5000)
-      console.log('Alice deposited 5000 coins to L2')
-      
+      await L1ERC20Deposit.deposit(AliceL1Wallet.getAddress(), 5000)      
+
       L2ERC20.transfer(BobL1Wallet.getAddress(), 3000)
-      console.log('Alice transfer 3000 to Bob')
 
-      let alice_l2balance = await L2ERC20.balanceOf(await AliceL1Wallet.getAddress())
-      let alice_l1balance = await L1ERC20.balanceOf(await AliceL1Wallet.getAddress())
-      console.log('Alice balance on l2', alice_l2balance.toString())
-      console.log('Alice balance on l1', alice_l1balance.toString())
-
-      await L2ERC20.withdraw(BobL1Wallet.getAddress(), 3000)
-      console.log('Bob withdrew 3000')
-
-      let bob_l2balance = await L2ERC20.balanceOf(await BobL1Wallet.getAddress())
-      let bob_l1balance = await L1ERC20.balanceOf(await BobL1Wallet.getAddress())
-      console.log('Bob balance on l2', bob_l2balance.toString())
-      console.log('Bob balance on l1', bob_l1balance.toString())
-
-      await expect(L2ERC20.withdraw(BobL1Wallet.getAddress(), 3000)).to.be.revertedWith("account doesn't have enough coins to burn")
+      await L2ERC20.connect(BobL1Wallet).withdraw(3000)
+      
+      await expect(L2ERC20.connect(BobL1Wallet).withdraw(3000)).to.be.revertedWith("account doesn't have enough coins to burn")
 
     })
 
     it('should not allow mallory to call withdraw', async () => {
       await L1ERC20.approve(L1ERC20Deposit.address, 5000)
       await L1ERC20Deposit.deposit(AliceL1Wallet.getAddress(), 5000)
-      await expect(L2ERC20.withdraw(MalloryL1Wallet.getAddress(), 3000)).to.be.revertedWith("account doesn't have enough coins to burn")
+
+      await expect(L2ERC20.connect(MalloryL1Wallet).withdraw(3000)).to.be.revertedWith("account doesn't have enough coins to burn")
     })
 
 

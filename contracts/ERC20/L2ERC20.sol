@@ -26,8 +26,8 @@ contract L2ERC20 is ERC20 {
         return true;
     }
 
-    function withdraw(address _depositor, uint256 _amount) public { 
-        _burn(_depositor, _amount);
-        l1ERC20Deposit.withdraw(_depositor, _amount); 
+    function withdraw(uint256 _amount) public { 
+        _burn(msg.sender, _amount);
+        l1ERC20Deposit.withdraw(msg.sender, _amount); 
     }
 }

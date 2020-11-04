@@ -31,7 +31,7 @@ contract L1ERC20Deposit {
         address _withdrawer,
         uint _amount
     ) public {
-        require(address(l2ERC20) == msg.sender); // this is authenticated
+        require(address(l2ERC20) == msg.sender);
         l1ERC20.transfer(_withdrawer, _amount);
     }
 
