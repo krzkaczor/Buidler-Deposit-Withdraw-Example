@@ -3,7 +3,14 @@ import { expect } from '../setup'
 /* External Imports */
 import { ethers } from '@nomiclabs/buidler'
 import { Signer, ContractFactory, Contract } from 'ethers'
+import { initCrossDomainMessengers, relayL1ToL2Messages, relayL2ToL1Messages } from '@eth-optimism/ovm-toolchain'
 import { assert } from 'console'
+
+/* Internal Imports */
+//import { increaseEthTime } from '../helpers'
+
+const l1ToL2MessageDelay = 0 //5 * 60 //5 minutes
+const l2ToL1MessageDelay = 0 //60 * 60 * 24 * 7 //1 week
 
 describe('EOA L1 <-> L2 Message Passing', () => {
   let AliceL1Wallet: Signer
@@ -14,6 +21,26 @@ describe('EOA L1 <-> L2 Message Passing', () => {
     // as to properly simulate cross domain calls.
     ;[AliceL1Wallet, BobL1Wallet, MalloryL1Wallet] = await ethers.getSigners()
   })
+
+  let signer: Signer
+  before(async () => {
+    ;[signer] = await ethers.getSigners()
+  })
+
+  let L1_CrossDomainMessenger: Contract
+  let L2_CrossDomainMessenger: Contract
+  beforeEach(async () => {
+    const messengers = await initCrossDomainMessengers(
+      l1ToL2MessageDelay,
+      l2ToL1MessageDelay,
+      ethers,
+      signer
+    )
+
+    L1_CrossDomainMessenger = messengers.l1CrossDomainMessenger
+    L2_CrossDomainMessenger = messengers.l2CrossDomainMessenger
+  })
+
 
   let ERC20Factory: ContractFactory
   let L2ERC20Factory: ContractFactory
@@ -27,6 +54,7 @@ describe('EOA L1 <-> L2 Message Passing', () => {
   let L1ERC20: Contract
   let L2ERC20: Contract
   let L1ERC20Deposit: Contract
+  
   beforeEach(async () => {
     L1ERC20 = await ERC20Factory.deploy(
       10000,
@@ -43,11 +71,13 @@ describe('EOA L1 <-> L2 Message Passing', () => {
     L1ERC20Deposit = await L1ERC20DepositFactory.deploy(
       L1ERC20.address,
       L2ERC20.address,
+      L1_CrossDomainMessenger.address
     )
-    L2ERC20.init(L1ERC20Deposit.address);
 
+    L2ERC20.init(L2_CrossDomainMessenger.address, L1ERC20Deposit.address);
 
   })
+
 
   describe('deposit and withdrawal', () => {
 
@@ -55,6 +85,7 @@ describe('EOA L1 <-> L2 Message Passing', () => {
 
       await L1ERC20.approve(L1ERC20Deposit.address, 5000)
       await L1ERC20Deposit.deposit(AliceL1Wallet.getAddress(), 5000)
+      await relayL1ToL2Messages(signer)
 
       let l2balance = await L2ERC20.balanceOf(await AliceL1Wallet.getAddress())
       let l1balance = await L1ERC20.balanceOf(await AliceL1Wallet.getAddress())
@@ -62,6 +93,8 @@ describe('EOA L1 <-> L2 Message Passing', () => {
       assert(l1balance == 5000, `l1 balance ${l1balance} != 5000` )
 
       await L2ERC20.connect(AliceL1Wallet).withdraw(2000)    
+      //await increaseEthTime(l1ToL2MessageDelay + 1)
+      await relayL2ToL1Messages(signer)
 
       l2balance = await L2ERC20.balanceOf(await AliceL1Wallet.getAddress())
       l1balance = await L1ERC20.balanceOf(await AliceL1Wallet.getAddress())
@@ -72,7 +105,7 @@ describe('EOA L1 <-> L2 Message Passing', () => {
     it('should allow an EOA to deposit and withdraw between two wallets', async () => {
       await L1ERC20.approve(L1ERC20Deposit.address, 5000)
       await L1ERC20Deposit.deposit(AliceL1Wallet.getAddress(), 5000)
-
+      await relayL1ToL2Messages(signer)
       L2ERC20.transfer(BobL1Wallet.getAddress(), 2000)
 
       let alice_l2balance = await L2ERC20.balanceOf(await AliceL1Wallet.getAddress())
@@ -85,6 +118,7 @@ describe('EOA L1 <-> L2 Message Passing', () => {
       assert(bob_l1balance == 0, `bob l1 balance ${bob_l1balance} != 0` )
 
       await L2ERC20.connect(BobL1Wallet).withdraw(1000)
+      await relayL2ToL1Messages(signer)
 
       alice_l2balance = await L2ERC20.balanceOf(await AliceL1Wallet.getAddress())
       alice_l1balance = await L1ERC20.balanceOf(await AliceL1Wallet.getAddress())
@@ -100,6 +134,7 @@ describe('EOA L1 <-> L2 Message Passing', () => {
     it('should not allow Alice to withdraw transferred $', async () => {
       await L1ERC20.approve(L1ERC20Deposit.address, 5000)
       await L1ERC20Deposit.deposit(AliceL1Wallet.getAddress(), 5000)
+      await relayL1ToL2Messages(signer)
 
       L2ERC20.transfer(BobL1Wallet.getAddress(), 5000)
 
@@ -108,11 +143,13 @@ describe('EOA L1 <-> L2 Message Passing', () => {
 
     it('should not allow Bob to withdraw twice', async () => {
       await L1ERC20.approve(L1ERC20Deposit.address, 5000)
-      await L1ERC20Deposit.deposit(AliceL1Wallet.getAddress(), 5000)      
+      await L1ERC20Deposit.deposit(AliceL1Wallet.getAddress(), 5000)
+      await relayL1ToL2Messages(signer)  
 
       L2ERC20.transfer(BobL1Wallet.getAddress(), 3000)
 
       await L2ERC20.connect(BobL1Wallet).withdraw(3000)
+      await relayL2ToL1Messages(signer)
       
       await expect(L2ERC20.connect(BobL1Wallet).withdraw(3000)).to.be.revertedWith("account doesn't have enough coins to burn")
 
@@ -121,6 +158,7 @@ describe('EOA L1 <-> L2 Message Passing', () => {
     it('should not allow mallory to call withdraw', async () => {
       await L1ERC20.approve(L1ERC20Deposit.address, 5000)
       await L1ERC20Deposit.deposit(AliceL1Wallet.getAddress(), 5000)
+      await relayL1ToL2Messages(signer)  
 
       await expect(L2ERC20.connect(MalloryL1Wallet).withdraw(3000)).to.be.revertedWith("account doesn't have enough coins to burn")
     })
