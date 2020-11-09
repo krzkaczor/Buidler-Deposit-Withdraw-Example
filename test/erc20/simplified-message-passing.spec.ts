@@ -1,7 +1,7 @@
 import { expect } from '../setup'
 
 /* External Imports */
-import { ethers } from '@nomiclabs/buidler'
+import { ethers } from 'hardhat'
 import { Signer, ContractFactory, Contract } from 'ethers'
 import { initCrossDomainMessengers, relayL1ToL2Messages, relayL2ToL1Messages } from '@eth-optimism/ovm-toolchain'
 import { assert } from 'console'
