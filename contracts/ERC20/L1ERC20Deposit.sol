@@ -43,6 +43,7 @@ contract L1ERC20Deposit {
         uint256 _amount
     ) public {
         require(l2ERC20Address == messenger.xDomainMessageSender());
+        require(msg.sender == address(messenger), "Only messages relayed by the L1CrossDomainMessenger can withdraw");
         l1ERC20.transfer(_withdrawer, _amount);
     }
 }

@@ -40,7 +40,6 @@ describe('EOA L1 <-> L2 Message Passing', () => {
     L2_CrossDomainMessenger = messengers.l2CrossDomainMessenger
   })
 
-
   let ERC20Factory: ContractFactory
   let L2ERC20Factory: ContractFactory
   let L1ERC20DepositFactory: ContractFactory
@@ -53,7 +52,6 @@ describe('EOA L1 <-> L2 Message Passing', () => {
   let L1ERC20: Contract
   let L2ERC20: Contract
   let L1ERC20Deposit: Contract
-
   beforeEach(async () => {
     L1ERC20 = await ERC20Factory.deploy(
       10000,
@@ -72,11 +70,8 @@ describe('EOA L1 <-> L2 Message Passing', () => {
       L2ERC20.address,
       L1_CrossDomainMessenger.address
     )
-
     L2ERC20.init(L2_CrossDomainMessenger.address, L1ERC20Deposit.address);
-
   })
-
 
   describe('deposit and withdrawal', () => {
 
@@ -151,7 +146,6 @@ describe('EOA L1 <-> L2 Message Passing', () => {
       await relayL2ToL1Messages(signer)
 
       await expect(L2ERC20.connect(BobL1Wallet).withdraw(3000)).to.be.revertedWith("Account doesn't have enough coins to burn")
-
     })
 
     it('should not allow mallory to call withdraw', async () => {
@@ -160,6 +154,27 @@ describe('EOA L1 <-> L2 Message Passing', () => {
       await relayL1ToL2Messages(signer)
 
       await expect(L2ERC20.connect(MalloryL1Wallet).withdraw(3000)).to.be.revertedWith("Account doesn't have enough coins to burn")
+    })
+
+    it ('should not allow mallory to mint infinite money', async () => {
+      await L1ERC20.approve(L1ERC20Deposit.address, 5000)
+      await L1ERC20Deposit.deposit(AliceL1Wallet.getAddress(), 5000)
+      await relayL1ToL2Messages(signer)
+
+      await expect(L2ERC20.mint(MalloryL1Wallet.getAddress(), 7000)).to.be.revertedWith("Only messages relayed by L2CrossDomainMessenger can mint")
+    })
+
+    it ('should not allow mallow to withdraw money that is not hers', async() => {
+      await L1ERC20.approve(L1ERC20Deposit.address, 5000)
+      await L1ERC20Deposit.deposit(AliceL1Wallet.getAddress(), 5000)
+      await relayL1ToL2Messages(signer)
+
+      await L2ERC20.withdraw(1000)
+      await relayL2ToL1Messages(signer)
+      let alice_l1balance = await L1ERC20.balanceOf(await AliceL1Wallet.getAddress())
+      assert(alice_l1balance == 6000, `alice l1 balance ${alice_l1balance} != 6000` )
+
+      await expect(L1ERC20Deposit.withdraw(MalloryL1Wallet.getAddress(), 2000)).to.be.revertedWith("Only messages relayed by the L1CrossDomainMessenger can withdraw")
     })
   })
 })

@@ -27,6 +27,7 @@ contract L2ERC20 is ERC20 {
 
     function mint(address _depositor, uint256 _amount) public returns (bool success) {
         require(messenger.xDomainMessageSender() == l1ERC20DepositAddress);
+        require(msg.sender == address(messenger), "Only messages relayed by L2CrossDomainMessenger can mint");
         _mint(_depositor, _amount);
         return true;
     }
