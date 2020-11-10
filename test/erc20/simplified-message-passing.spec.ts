@@ -18,8 +18,6 @@ describe('EOA L1 <-> L2 Message Passing', () => {
   let BobL1Wallet: Signer
   let MalloryL1Wallet: Signer
   before(async () => {
-    // TODO: Update this to attach to different ethers providers within buidler
-    // as to properly simulate cross domain calls.
     ;[AliceL1Wallet, BobL1Wallet, MalloryL1Wallet] = await ethers.getSigners()
   })
 
