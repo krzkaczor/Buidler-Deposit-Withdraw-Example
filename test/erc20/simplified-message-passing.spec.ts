@@ -60,7 +60,6 @@ describe('EOA L1 <-> L2 Message Passing', () => {
       'TEST',
     )
     L2ERC20 = await L2ERC20Factory.deploy(
-      0,
       'TEST TOKEN',
       0,
       'TEST',
@@ -83,8 +82,8 @@ describe('EOA L1 <-> L2 Message Passing', () => {
 
       let l2balance = await L2ERC20.balanceOf(await AliceL1Wallet.getAddress())
       let l1balance = await L1ERC20.balanceOf(await AliceL1Wallet.getAddress())
-      assert(l2balance == 5000, `l2 balance ${l2balance} != 5000` )
-      assert(l1balance == 5000, `l1 balance ${l1balance} != 5000` )
+      expect(l2balance).to.be.equal(5000)
+      expect(l1balance).to.be.equal(5000)
 
       await L2ERC20.connect(AliceL1Wallet).withdraw(2000)
       //await increaseEthTime(l1ToL2MessageDelay + 1)
@@ -92,8 +91,8 @@ describe('EOA L1 <-> L2 Message Passing', () => {
 
       l2balance = await L2ERC20.balanceOf(await AliceL1Wallet.getAddress())
       l1balance = await L1ERC20.balanceOf(await AliceL1Wallet.getAddress())
-      expect(l1balance).to.be.equal(7000)
       expect(l2balance).to.be.equal(3000)
+      expect(l1balance).to.be.equal(7000)
     })
 
     it('should allow an EOA to deposit and withdraw between two wallets', async () => {
@@ -102,27 +101,18 @@ describe('EOA L1 <-> L2 Message Passing', () => {
       await relayL1ToL2Messages(signer)
       L2ERC20.transfer(BobL1Wallet.getAddress(), 2000)
 
-      let alice_l2balance = await L2ERC20.balanceOf(await AliceL1Wallet.getAddress())
-      let alice_l1balance = await L1ERC20.balanceOf(await AliceL1Wallet.getAddress())
-      let bob_l2balance = await L2ERC20.balanceOf(await BobL1Wallet.getAddress())
-      let bob_l1balance = await L1ERC20.balanceOf(await BobL1Wallet.getAddress())
-      assert(alice_l2balance == 3000, `alice l2 balance ${alice_l2balance} != 3000` )
-      assert(alice_l1balance == 5000, `alice l1 balance ${alice_l1balance} != 5000` )
-      assert(bob_l2balance == 2000, `bob l2 balance ${bob_l2balance} != 2000` )
-      assert(bob_l1balance == 0, `bob l1 balance ${bob_l1balance} != 0` )
+      expect( await L2ERC20.balanceOf(await AliceL1Wallet.getAddress()) ).to.be.equal(3000)
+      expect( await L1ERC20.balanceOf(await AliceL1Wallet.getAddress()) ).to.be.equal(5000)
+      expect( await L2ERC20.balanceOf(await BobL1Wallet.getAddress())   ).to.be.equal(2000)
+      expect( await L1ERC20.balanceOf(await BobL1Wallet.getAddress())   ).to.be.equal(0)
 
       await L2ERC20.connect(BobL1Wallet).withdraw(1000)
       await relayL2ToL1Messages(signer)
 
-      alice_l2balance = await L2ERC20.balanceOf(await AliceL1Wallet.getAddress())
-      alice_l1balance = await L1ERC20.balanceOf(await AliceL1Wallet.getAddress())
-      bob_l2balance = await L2ERC20.balanceOf(await BobL1Wallet.getAddress())
-      bob_l1balance = await L1ERC20.balanceOf(await BobL1Wallet.getAddress())
-
-      expect(alice_l2balance).to.be.eq(3000)
-      expect(alice_l1balance).to.be.eq(5000)
-      expect(bob_l2balance).to.be.eq(1000)
-      expect(bob_l1balance).to.be.eq(1000)
+      expect( await L2ERC20.balanceOf(await AliceL1Wallet.getAddress()) ).to.be.eq(3000)
+      expect( await L1ERC20.balanceOf(await AliceL1Wallet.getAddress()) ).to.be.eq(5000)
+      expect( await L2ERC20.balanceOf(await BobL1Wallet.getAddress())   ).to.be.eq(1000)
+      expect( await L1ERC20.balanceOf(await BobL1Wallet.getAddress())   ).to.be.eq(1000)
     })
 
     it('should not allow Alice to withdraw transferred $', async () => {
@@ -132,7 +122,7 @@ describe('EOA L1 <-> L2 Message Passing', () => {
 
       L2ERC20.transfer(BobL1Wallet.getAddress(), 5000)
 
-      await expect(L2ERC20.connect(AliceL1Wallet).withdraw(2000)).to.be.revertedWith("Account doesn't have enough coins to burn")
+      await expect( L2ERC20.connect(AliceL1Wallet).withdraw(2000) ).to.be.revertedWith("Account doesn't have enough coins to burn")
     })
 
     it('should not allow Bob to withdraw twice', async () => {
@@ -145,7 +135,7 @@ describe('EOA L1 <-> L2 Message Passing', () => {
       await L2ERC20.connect(BobL1Wallet).withdraw(3000)
       await relayL2ToL1Messages(signer)
 
-      await expect(L2ERC20.connect(BobL1Wallet).withdraw(3000)).to.be.revertedWith("Account doesn't have enough coins to burn")
+      await expect( L2ERC20.connect(BobL1Wallet).withdraw(3000) ).to.be.revertedWith("Account doesn't have enough coins to burn")
     })
 
     it('should not allow mallory to call withdraw', async () => {
@@ -153,7 +143,7 @@ describe('EOA L1 <-> L2 Message Passing', () => {
       await L1ERC20Deposit.deposit(AliceL1Wallet.getAddress(), 5000)
       await relayL1ToL2Messages(signer)
 
-      await expect(L2ERC20.connect(MalloryL1Wallet).withdraw(3000)).to.be.revertedWith("Account doesn't have enough coins to burn")
+      await expect( L2ERC20.connect(MalloryL1Wallet).withdraw(3000) ).to.be.revertedWith("Account doesn't have enough coins to burn")
     })
 
     it ('should not allow mallory to mint infinite money', async () => {
@@ -161,7 +151,7 @@ describe('EOA L1 <-> L2 Message Passing', () => {
       await L1ERC20Deposit.deposit(AliceL1Wallet.getAddress(), 5000)
       await relayL1ToL2Messages(signer)
 
-      await expect(L2ERC20.mint(MalloryL1Wallet.getAddress(), 7000)).to.be.revertedWith("Only messages relayed by L2CrossDomainMessenger can mint")
+      await expect( L2ERC20.mint(MalloryL1Wallet.getAddress(), 7000) ).to.be.revertedWith("Only messages relayed by L2CrossDomainMessenger can mint")
     })
 
     it ('should not allow mallow to withdraw money that is not hers', async() => {
@@ -171,10 +161,8 @@ describe('EOA L1 <-> L2 Message Passing', () => {
 
       await L2ERC20.withdraw(1000)
       await relayL2ToL1Messages(signer)
-      let alice_l1balance = await L1ERC20.balanceOf(await AliceL1Wallet.getAddress())
-      assert(alice_l1balance == 6000, `alice l1 balance ${alice_l1balance} != 6000` )
 
-      await expect(L1ERC20Deposit.withdraw(MalloryL1Wallet.getAddress(), 2000)).to.be.revertedWith("Only messages relayed by the L1CrossDomainMessenger can withdraw")
+      await expect( L1ERC20Deposit.withdraw(MalloryL1Wallet.getAddress(), 2000) ).to.be.revertedWith("Only messages relayed by the L1CrossDomainMessenger can withdraw")
     })
   })
 })

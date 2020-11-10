@@ -10,11 +10,10 @@ contract L2ERC20 is ERC20 {
     iOVM_BaseCrossDomainMessenger internal messenger;
 
     constructor(
-        uint256 _initialAmount,
         string memory _tokenName,
         uint8 _decimalUnits,
         string memory _tokenSymbol
-    ) public ERC20(_initialAmount, _tokenName, _decimalUnits, _tokenSymbol) {}
+    ) public ERC20(0, _tokenName, _decimalUnits, _tokenSymbol) {}
 
     function init(
         address _messenger,
