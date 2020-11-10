@@ -65,9 +65,10 @@ contract ERC20 is IERC20 {
     }
 
     function _burn(address _owner, uint256 _value) internal returns (bool success) {
-        require(balances[_owner] >= _value);
+        require(balances[_owner] >= _value, "Account doesn't have enough coins to burn");
         balances[_owner] -= _value;
         totalSupply -= _value;
         return true;
     }
+
 }
