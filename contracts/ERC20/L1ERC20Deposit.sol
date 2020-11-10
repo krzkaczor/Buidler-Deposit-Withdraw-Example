@@ -11,7 +11,7 @@ contract L1ERC20Deposit {
 
     constructor (
         address _L1ERC20Address,
-        address _L2ERC20Address, 
+        address _L2ERC20Address,
         address _messenger
     ) public {
         l1ERC20 = IERC20(_L1ERC20Address);
@@ -28,22 +28,21 @@ contract L1ERC20Deposit {
             address(this),
             _amount
         );
-        
+
         // Generate encoded calldata to be executed on L2.
         bytes memory message = abi.encodeWithSignature(
-            "deposit(address,uint256)",
+            "mint(address,uint256)",
             _depositer,
             _amount
         );
-        messenger.sendMessage(l2ERC20Address, message, 1000000);
+        messenger.sendMessage(l2ERC20Address, message, 1000000); //TODO: meter this, find a lower-bounded value
     }
 
-    function withdraw( 
+    function withdraw(
         address _withdrawer,
         uint256 _amount
     ) public {
         require(l2ERC20Address == messenger.xDomainMessageSender());
-        l1ERC20.transfer(_withdrawer, _amount); 
+        l1ERC20.transfer(_withdrawer, _amount);
     }
-
 }

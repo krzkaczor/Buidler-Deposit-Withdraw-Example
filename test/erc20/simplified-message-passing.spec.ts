@@ -9,6 +9,7 @@ import { assert } from 'console'
 /* Internal Imports */
 //import { increaseEthTime } from '../helpers'
 
+//TODO: add in delays
 const l1ToL2MessageDelay = 0 //5 * 60 //5 minutes
 const l2ToL1MessageDelay = 0 //60 * 60 * 24 * 7 //1 week
 
@@ -54,7 +55,7 @@ describe('EOA L1 <-> L2 Message Passing', () => {
   let L1ERC20: Contract
   let L2ERC20: Contract
   let L1ERC20Deposit: Contract
-  
+
   beforeEach(async () => {
     L1ERC20 = await ERC20Factory.deploy(
       10000,
@@ -92,7 +93,7 @@ describe('EOA L1 <-> L2 Message Passing', () => {
       assert(l2balance == 5000, `l2 balance ${l2balance} != 5000` )
       assert(l1balance == 5000, `l1 balance ${l1balance} != 5000` )
 
-      await L2ERC20.connect(AliceL1Wallet).withdraw(2000)    
+      await L2ERC20.connect(AliceL1Wallet).withdraw(2000)
       //await increaseEthTime(l1ToL2MessageDelay + 1)
       await relayL2ToL1Messages(signer)
 
@@ -138,32 +139,29 @@ describe('EOA L1 <-> L2 Message Passing', () => {
 
       L2ERC20.transfer(BobL1Wallet.getAddress(), 5000)
 
-      await expect(L2ERC20.connect(AliceL1Wallet).withdraw(2000)).to.be.revertedWith("account doesn't have enough coins to burn")
+      await expect(L2ERC20.connect(AliceL1Wallet).withdraw(2000)).to.be.revertedWith("Account doesn't have enough coins to burn")
     })
 
     it('should not allow Bob to withdraw twice', async () => {
       await L1ERC20.approve(L1ERC20Deposit.address, 5000)
       await L1ERC20Deposit.deposit(AliceL1Wallet.getAddress(), 5000)
-      await relayL1ToL2Messages(signer)  
+      await relayL1ToL2Messages(signer)
 
       L2ERC20.transfer(BobL1Wallet.getAddress(), 3000)
 
       await L2ERC20.connect(BobL1Wallet).withdraw(3000)
       await relayL2ToL1Messages(signer)
-      
-      await expect(L2ERC20.connect(BobL1Wallet).withdraw(3000)).to.be.revertedWith("account doesn't have enough coins to burn")
+
+      await expect(L2ERC20.connect(BobL1Wallet).withdraw(3000)).to.be.revertedWith("Account doesn't have enough coins to burn")
 
     })
 
     it('should not allow mallory to call withdraw', async () => {
       await L1ERC20.approve(L1ERC20Deposit.address, 5000)
       await L1ERC20Deposit.deposit(AliceL1Wallet.getAddress(), 5000)
-      await relayL1ToL2Messages(signer)  
+      await relayL1ToL2Messages(signer)
 
-      await expect(L2ERC20.connect(MalloryL1Wallet).withdraw(3000)).to.be.revertedWith("account doesn't have enough coins to burn")
+      await expect(L2ERC20.connect(MalloryL1Wallet).withdraw(3000)).to.be.revertedWith("Account doesn't have enough coins to burn")
     })
-
-
-
   })
 })

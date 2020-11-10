@@ -25,13 +25,13 @@ contract L2ERC20 is ERC20 {
         l1ERC20DepositAddress = _L1ERC20DepositAddress;
     }
 
-    function deposit(address _depositor, uint256 _amount) public returns (bool success) {
-        require(messenger.xDomainMessageSender() == l1ERC20DepositAddress); //??
+    function mint(address _depositor, uint256 _amount) public returns (bool success) {
+        require(messenger.xDomainMessageSender() == l1ERC20DepositAddress);
         _mint(_depositor, _amount);
         return true;
     }
 
-    function withdraw(uint256 _amount) public { 
+    function withdraw(uint256 _amount) public {
         _burn(msg.sender, _amount);
         // generate encoded calldata to be executed on L1
         bytes memory message = abi.encodeWithSignature(
