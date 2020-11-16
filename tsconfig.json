@@ -2,7 +2,7 @@
   "compilerOptions": {
     "outDir": "./build",
     "baseUrl": "./",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
   },
   "include": ["*.ts", "**/*.ts", "artifacts/*.json"],
   "exclude": ["./build", "node_modules"],

@@ -14,6 +14,12 @@ const config: HardhatUserConfig = {
     }
   },
   networks: {
+    optimismL1: {
+      url: "http://localhost:9545",
+    },
+    optimismL2: {
+      url: "http://localhost:8545",
+    },
     hardhat: {
       blockGasLimit: 15000000
     }
