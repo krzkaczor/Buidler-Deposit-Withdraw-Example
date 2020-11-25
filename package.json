@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "yarn run build:contracts",
+    "build": "yarn run build:contracts && yarn run build:contracts:l2",
     "build:contracts": "hardhat compile",
     "build:contracts:l2": "rm -rf build-l2 && ./node_modules/@eth-optimism/solc/solcjs --bin --abi -o ./build-l2 ./contracts/l2/L2ERC20.sol",
     "test": "yarn run test:contracts",
